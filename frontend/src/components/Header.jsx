@@ -11,13 +11,19 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
+import { useNavigate } from 'react-router-dom';
 
-const pages = ['Github', 'Notion', 'portpolio'];
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+const pages = [
+  { name: 'Notion', url: 'https://www.notion.so/2f56f117037b4bf8a0371b46c0ff84e0?pvs=4' },
+  { name: 'GitHub', url: 'https://github.com/Jeonginji' },
+  { name: 'Project', url: 'https://your-project-url.com' }
+];
+const settings = ['About me', 'Skill', 'Login'];
 
-const ResponsiveAppBar = () => {
+const ResponsiveAppBar = ({ isLoggedIn, onLogout }) => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const navigate = useNavigate();
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -34,6 +40,27 @@ const ResponsiveAppBar = () => {
     setAnchorElUser(null);
   };
 
+  const handleLoginLogout = () => {
+    handleCloseUserMenu();
+    if (isLoggedIn) {
+      onLogout(); // 로그아웃 처리
+    } else {
+      navigate('/login'); // 로그인 페이지로 이동
+    }
+  };
+
+  const scrollToAboutMe = () => {
+    const aboutMeSection = document.getElementById('about-me');
+    if (aboutMeSection) {
+      aboutMeSection.scrollIntoView({ behavior: 'smooth' });
+      handleCloseUserMenu(); // 메뉴 닫기
+    }
+  };
+
+  const handlePortfolioClick = () => {
+    navigate('/'); // 메인 페이지로 이동
+  };
+
   return (
     <AppBar position="static" sx={{ backgroundColor: '#f3ede8' }}>
       <Container maxWidth="xl">
@@ -42,7 +69,7 @@ const ResponsiveAppBar = () => {
             variant="h6"
             noWrap
             component="a"
-            href="#app-bar-with-responsive-menu"
+            onClick={handlePortfolioClick} // 메인 페이지로 이동
             sx={{
               mr: 2,
               display: { xs: 'none', md: 'flex' },
@@ -51,9 +78,10 @@ const ResponsiveAppBar = () => {
               letterSpacing: '.3rem',
               color: 'black',
               textDecoration: 'none',
+              cursor: 'pointer', // 클릭 가능임을 나타내는 커서
             }}
           >
-            Inji's portpolio
+            Inji's Portfolio
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
@@ -84,42 +112,25 @@ const ResponsiveAppBar = () => {
               sx={{ display: { xs: 'block', md: 'none' } }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography sx={{ textAlign: 'center' }}>{page}</Typography>
+                <MenuItem key={page.name} onClick={() => window.open(page.url, '_blank')}>
+                  <Typography sx={{ textAlign: 'center' }}>{page.name}</Typography>
                 </MenuItem>
               ))}
             </Menu>
           </Box>
-          {/* AdbIcon 제거 */}
-          <Typography
-            variant="h5"
-            noWrap
-            component="a"
-            href="#app-bar-with-responsive-menu"
-            sx={{
-              mr: 2,
-              display: { xs: 'flex', md: 'none' },
-              flexGrow: 1,
-              fontFamily: 'monospace',
-              fontWeight: 700,
-              letterSpacing: '.3rem',
-              color: 'inherit',
-              textDecoration: 'none',
-            }}
-          >
-             My Custom Logo 
-          </Typography>
+
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
               <Button
-                key={page}
-                onClick={handleCloseNavMenu}
+                key={page.name}
+                onClick={() => window.open(page.url, '_blank')}
                 sx={{ my: 2, color: 'black', display: 'block' }}
               >
-                {page}
+                {page.name}
               </Button>
             ))}
           </Box>
+
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
@@ -143,9 +154,25 @@ const ResponsiveAppBar = () => {
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
-                </MenuItem>
+                setting === 'Login' ? (
+                  <MenuItem key={setting} onClick={handleLoginLogout}>
+                    <Typography sx={{ textAlign: 'center' }}>
+                      {isLoggedIn ? 'Logout' : 'Login'}
+                    </Typography>
+                  </MenuItem>
+                ) : setting === 'About me' ? (
+                  <MenuItem key={setting} onClick={scrollToAboutMe}>
+                    <Typography sx={{ textAlign: 'center', textDecoration: 'none', color: 'inherit' }}>
+                      About me
+                    </Typography>
+                  </MenuItem>
+                ) : (
+                  <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                    <Typography sx={{ textAlign: 'center' }}>
+                      {setting}
+                    </Typography>
+                  </MenuItem>
+                )
               ))}
             </Menu>
           </Box>
