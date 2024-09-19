@@ -18,27 +18,18 @@ const pages = [
   { name: 'GitHub', url: 'https://github.com/Jeonginji' },
   { name: 'Project', url: 'https://your-project-url.com' }
 ];
-const settings = ['About me', 'Skill', 'Login'];
 
-const ResponsiveAppBar = ({ isLoggedIn, onLogout }) => {
+const settings = ['About Me', 'Skills', 'Projects', 'Login'];
+
+const ResponsiveAppBar = ({ isLoggedIn, onLogout, aboutRef, skillsRef, projectsRef }) => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const navigate = useNavigate();
 
-  const handleOpenNavMenu = (event) => {
-    setAnchorElNav(event.currentTarget);
-  };
-  const handleOpenUserMenu = (event) => {
-    setAnchorElUser(event.currentTarget);
-  };
-
-  const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
-  };
-
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
-  };
+  const handleOpenNavMenu = (event) => setAnchorElNav(event.currentTarget);
+  const handleOpenUserMenu = (event) => setAnchorElUser(event.currentTarget);
+  const handleCloseNavMenu = () => setAnchorElNav(null);
+  const handleCloseUserMenu = () => setAnchorElUser(null);
 
   const handleLoginLogout = () => {
     handleCloseUserMenu();
@@ -49,16 +40,12 @@ const ResponsiveAppBar = ({ isLoggedIn, onLogout }) => {
     }
   };
 
-  const scrollToAboutMe = () => {
-    const aboutMeSection = document.getElementById('about-me');
-    if (aboutMeSection) {
-      aboutMeSection.scrollIntoView({ behavior: 'smooth' });
+  // 섹션으로 스크롤하는 함수
+  const scrollToSection = (ref) => {
+    if (ref.current) {
+      ref.current.scrollIntoView({ behavior: 'smooth' });
       handleCloseUserMenu(); // 메뉴 닫기
     }
-  };
-
-  const handlePortfolioClick = () => {
-    navigate('/'); // 메인 페이지로 이동
   };
 
   return (
@@ -69,7 +56,7 @@ const ResponsiveAppBar = ({ isLoggedIn, onLogout }) => {
             variant="h6"
             noWrap
             component="a"
-            onClick={handlePortfolioClick} // 메인 페이지로 이동
+            onClick={() => navigate('/')}
             sx={{
               mr: 2,
               display: { xs: 'none', md: 'flex' },
@@ -78,7 +65,7 @@ const ResponsiveAppBar = ({ isLoggedIn, onLogout }) => {
               letterSpacing: '.3rem',
               color: 'black',
               textDecoration: 'none',
-              cursor: 'pointer', // 클릭 가능임을 나타내는 커서
+              cursor: 'pointer',
             }}
           >
             Inji's Portfolio
@@ -87,7 +74,7 @@ const ResponsiveAppBar = ({ isLoggedIn, onLogout }) => {
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
             <IconButton
               size="large"
-              aria-label="account of current user"
+              aria-label="open navigation menu"
               aria-controls="menu-appbar"
               aria-haspopup="true"
               onClick={handleOpenNavMenu}
@@ -98,15 +85,9 @@ const ResponsiveAppBar = ({ isLoggedIn, onLogout }) => {
             <Menu
               id="menu-appbar"
               anchorEl={anchorElNav}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'left',
-              }}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
               keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'left',
-              }}
+              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
               open={Boolean(anchorElNav)}
               onClose={handleCloseNavMenu}
               sx={{ display: { xs: 'block', md: 'none' } }}
@@ -141,38 +122,31 @@ const ResponsiveAppBar = ({ isLoggedIn, onLogout }) => {
               sx={{ mt: '45px' }}
               id="menu-appbar"
               anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
+              anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
               keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
+              transformOrigin={{ vertical: 'top', horizontal: 'right' }}
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting) => (
-                setting === 'Login' ? (
-                  <MenuItem key={setting} onClick={handleLoginLogout}>
-                    <Typography sx={{ textAlign: 'center' }}>
-                      {isLoggedIn ? 'Logout' : 'Login'}
-                    </Typography>
-                  </MenuItem>
-                ) : setting === 'About me' ? (
-                  <MenuItem key={setting} onClick={scrollToAboutMe}>
-                    <Typography sx={{ textAlign: 'center', textDecoration: 'none', color: 'inherit' }}>
-                      About me
-                    </Typography>
-                  </MenuItem>
-                ) : (
-                  <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                    <Typography sx={{ textAlign: 'center' }}>
-                      {setting}
-                    </Typography>
-                  </MenuItem>
-                )
+                <MenuItem 
+                  key={setting}
+                  onClick={() => {
+                    if (setting === 'About Me') {
+                      scrollToSection(aboutRef);
+                    } else if (setting === 'Skills') {
+                      scrollToSection(skillsRef);
+                    } else if (setting === 'Projects') {
+                      scrollToSection(projectsRef);
+                    } else if (setting === 'Login') {
+                      handleLoginLogout();
+                    }
+                  }}
+                >
+                  <Typography sx={{ textAlign: 'center' }}>
+                    {setting === 'Login' ? (isLoggedIn ? 'Logout' : 'Login') : setting}
+                  </Typography>
+                </MenuItem>
               ))}
             </Menu>
           </Box>
