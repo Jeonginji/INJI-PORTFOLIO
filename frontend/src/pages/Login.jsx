@@ -10,17 +10,37 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import LockIcon from '@mui/icons-material/Lock';
 import Grid from '@mui/material/Grid';
 import Link from '@mui/material/Link';
+import { useState } from 'react';
+import instance from '../axios';
 
 const theme = createTheme();
 
 const LoginPage = () => {
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+  const [id, setId] = useState("");
+  const [pw, setPw] = useState("");
+
+  const handleSubmit = async (e) => { 
+    e.preventDefault();
+    let res; // res 변수를 여기서 선언
+
+    try {
+      res = await instance.post('/handleSubmit', { id: id, pw: pw });
+      console.log('Response:', res.data); // 응답 데이터 출력
+
+      // 로그인 성공 여부 확인
+      if (res.data.result === 'success') {
+        // 세션 저장
+        let obj = { auth: 'user', id: res.data.id };
+        sessionStorage.setItem('info', JSON.stringify(obj));
+        window.location.href = "/";
+      } else {
+        alert('다시 입력해주세요!');
+        setId("");
+        setPw("");
+      }
+    } catch (error) {
+      console.error('Login error:', error); // 에러 처리
+    }
   };
 
   return (
@@ -46,7 +66,7 @@ const LoginPage = () => {
             로그인
           </Typography>
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-            <TextField
+            <TextField value={id} onChange={(e) => { setId(e.target.value) }}
               margin="normal"
               fullWidth
               id="email"
@@ -55,31 +75,31 @@ const LoginPage = () => {
               autoComplete="email"
               autoFocus
               InputProps={{
-                sx: { color: 'black' }, // 글자 색상 검정색으로 변경
+                sx: { color: 'black' },
               }}
               InputLabelProps={{
                 sx: {
-                  color: 'black', // 레이블 색상 검정색으로 변경
+                  color: 'black',
                   '&.Mui-focused': {
-                    color: 'black', // 포커스 시 레이블 색상
+                    color: 'black',
                   },
                 },
               }}
               sx={{
                 '& .MuiOutlinedInput-root': {
                   '& fieldset': {
-                    borderColor: 'black', // 기본 테두리 색상
+                    borderColor: 'black',
                   },
                   '&:hover fieldset': {
-                    borderColor: 'black', // hover 시 테두리 색상
+                    borderColor: 'black',
                   },
                   '&.Mui-focused fieldset': {
-                    borderColor: 'black', // 포커스 시 테두리 색상
+                    borderColor: 'black',
                   },
                 },
               }}
             />
-            <TextField
+            <TextField value={pw} onChange={(e) => { setPw(e.target.value) }}
               margin="normal"
               fullWidth
               name="password"
@@ -88,26 +108,26 @@ const LoginPage = () => {
               id="password"
               autoComplete="current-password"
               InputProps={{
-                sx: { color: 'black' }, // 글자 색상 검정색으로 변경
+                sx: { color: 'black' },
               }}
               InputLabelProps={{
                 sx: {
-                  color: 'black', // 레이블 색상 검정색으로 변경
+                  color: 'black',
                   '&.Mui-focused': {
-                    color: 'black', // 포커스 시 레이블 색상
+                    color: 'black',
                   },
                 },
               }}
               sx={{
                 '& .MuiOutlinedInput-root': {
                   '& fieldset': {
-                    borderColor: 'black', // 기본 테두리 색상
+                    borderColor: 'black',
                   },
                   '&:hover fieldset': {
-                    borderColor: 'black', // hover 시 테두리 색상
+                    borderColor: 'black',
                   },
                   '&.Mui-focused fieldset': {
-                    borderColor: 'black', // 포커스 시 테두리 색상
+                    borderColor: 'black',
                   },
                 },
               }}
@@ -116,7 +136,7 @@ const LoginPage = () => {
               type="submit"
               fullWidth
               variant="contained"
-              sx={{ mt: 3, mb: 2, bgcolor: 'black', color: 'white' }} // 버튼 색상 검정색으로
+              sx={{ mt: 3, mb: 2, bgcolor: 'black', color: 'white' }}
             >
               로그인
             </Button>

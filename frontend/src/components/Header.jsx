@@ -16,10 +16,9 @@ import { useNavigate } from 'react-router-dom';
 const pages = [
   { name: 'Notion', url: 'https://www.notion.so/2f56f117037b4bf8a0371b46c0ff84e0?pvs=4' },
   { name: 'GitHub', url: 'https://github.com/Jeonginji' },
-  { name: 'Project', url: 'https://your-project-url.com' }
 ];
 
-const settings = ['About Me', 'Skills', 'Projects', 'Login'];
+const settings = ['About Me', 'Skills', 'Projects'];
 
 const ResponsiveAppBar = ({ isLoggedIn, onLogout, aboutRef, skillsRef, projectsRef }) => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -35,6 +34,9 @@ const ResponsiveAppBar = ({ isLoggedIn, onLogout, aboutRef, skillsRef, projectsR
     handleCloseUserMenu();
     if (isLoggedIn) {
       onLogout(); // 로그아웃 처리
+      sessionStorage.removeItem('info'); // 세션 삭제
+      alert('다음에 다시 방문해주세요...');
+      window.location.href = "/"; // 홈으로 이동
     } else {
       navigate('/login'); // 로그인 페이지로 이동
     }
@@ -92,8 +94,8 @@ const ResponsiveAppBar = ({ isLoggedIn, onLogout, aboutRef, skillsRef, projectsR
               onClose={handleCloseNavMenu}
               sx={{ display: { xs: 'block', md: 'none' } }}
             >
-              {pages.map((page) => (
-                <MenuItem key={page.name} onClick={() => window.open(page.url, '_blank')}>
+              {pages.map((page, index) => (
+                <MenuItem key={index} onClick={() => window.open(page.url, '_blank')}>
                   <Typography sx={{ textAlign: 'center' }}>{page.name}</Typography>
                 </MenuItem>
               ))}
@@ -101,9 +103,9 @@ const ResponsiveAppBar = ({ isLoggedIn, onLogout, aboutRef, skillsRef, projectsR
           </Box>
 
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-            {pages.map((page) => (
+            {pages.map((page, index) => (
               <Button
-                key={page.name}
+                key={index}
                 onClick={() => window.open(page.url, '_blank')}
                 sx={{ my: 2, color: 'black', display: 'block' }}
               >
@@ -128,9 +130,9 @@ const ResponsiveAppBar = ({ isLoggedIn, onLogout, aboutRef, skillsRef, projectsR
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              {settings.map((setting) => (
-                <MenuItem 
-                  key={setting}
+              {settings.map((setting, index) => (
+                <MenuItem
+                  key={index}
                   onClick={() => {
                     if (setting === 'About Me') {
                       scrollToSection(aboutRef);
@@ -138,16 +140,19 @@ const ResponsiveAppBar = ({ isLoggedIn, onLogout, aboutRef, skillsRef, projectsR
                       scrollToSection(skillsRef);
                     } else if (setting === 'Projects') {
                       scrollToSection(projectsRef);
-                    } else if (setting === 'Login') {
-                      handleLoginLogout();
                     }
                   }}
                 >
                   <Typography sx={{ textAlign: 'center' }}>
-                    {setting === 'Login' ? (isLoggedIn ? 'Logout' : 'Login') : setting}
+                    {setting}
                   </Typography>
                 </MenuItem>
               ))}
+              <MenuItem onClick={handleLoginLogout}>
+                <Typography sx={{ textAlign: 'center' }}>
+                  {isLoggedIn ? 'Logout' : 'Login'}
+                </Typography>
+              </MenuItem>
             </Menu>
           </Box>
         </Toolbar>
