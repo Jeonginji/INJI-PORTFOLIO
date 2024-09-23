@@ -46,7 +46,7 @@ function App() {
         } />
         
         {/* 로그인 및 회원가입 페이지 */}
-        <Route path='/login' element={<Login onLogin={handleLogin} />} />
+        <Route path='/login' element={<Login onLogin={handleLogin} setIsLoggedIn={setIsLoggedIn}/>} />
         <Route path='/join' element={<Join />} />
       </Routes>
 

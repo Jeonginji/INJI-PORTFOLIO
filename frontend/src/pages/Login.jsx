@@ -12,12 +12,14 @@ import Grid from '@mui/material/Grid';
 import Link from '@mui/material/Link';
 import { useState } from 'react';
 import instance from '../axios';
+import { useNavigate } from 'react-router-dom';
 
 const theme = createTheme();
 
-const LoginPage = () => {
+const LoginPage = ({setIsLoggedIn}) => {
   const [id, setId] = useState("");
   const [pw, setPw] = useState("");
+  const nav = useNavigate()
 
   const handleSubmit = async (e) => { 
     e.preventDefault();
@@ -30,9 +32,11 @@ const LoginPage = () => {
       // 로그인 성공 여부 확인
       if (res.data.result === 'success') {
         // 세션 저장
+        setIsLoggedIn(true)
         let obj = { auth: 'user', id: res.data.id };
         sessionStorage.setItem('info', JSON.stringify(obj));
-        window.location.href = "/";
+        nav('/')
+
       } else {
         alert('다시 입력해주세요!');
         setId("");
